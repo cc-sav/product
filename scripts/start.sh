@@ -1,3 +1,6 @@
-#!/usr/bin/env sh
+cd /vagrant
 
-# TODO: Start Caddy and the controller.
+bin/caddy -pidfile='/vagrant/.caddypid' &
+sleep 2
+echo "Finished. Server is running in process "
+cat /vagrant/.caddypid
