@@ -1,6 +1,9 @@
 cd /vagrant
 
+scripts/kill.sh
+
+bin/controller &
 bin/caddy -pidfile='/vagrant/.caddypid' &
 sleep 2
-echo "Finished. Server is running in process "
+printf "Finished. Server is running in process "
 cat /vagrant/.caddypid
