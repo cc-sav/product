@@ -15,11 +15,12 @@ func main() {
 	})
 
 	http.HandleFunc("/args", func(w http.ResponseWriter, r *http.Request) {
-		if argId, found = findArgIdInPath(r.URL.Path); found {
-			displayArg(argId)
+		if argID, found := findArgIDInPath(r.URL.Path); found {
+			_ = argID
+			// displayArg(argId)
 			return
 		}
-		
+
 		fmt.Fprint(w, "<h1>All Arguments</h1>")
 
 		// TODO: Load arguments from Nick
@@ -40,7 +41,7 @@ func main() {
 	http.ListenAndServe("localhost:8000", nil)
 }
 
-func findArgIdInPath(p string) (string, bool) {
-	return ("", false)
+func findArgIDInPath(p string) (string, bool) {
+	return "", false
 	// if p[0:len(p)-3]
 }
