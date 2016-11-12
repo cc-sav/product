@@ -1,7 +1,46 @@
 package main
 
 import "fmt"
+import "net/http"
 
 func main() {
 	fmt.Println("Main running.")
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+		fmt.Fprint(w, "<p>Hello from <strong>Go</strong></p>")
+	})
+
+	http.HandleFunc("/args", func(w http.ResponseWriter, r *http.Request) {
+		if argId, found = findArgIdInPath(r.URL.Path); found {
+			displayArg(argId)
+			return
+		}
+		
+		fmt.Fprint(w, "<h1>All Arguments</h1>")
+
+		// TODO: Load arguments from Nick
+		arguments := loadArguments(0)
+
+		if len(arguments) == 0 {
+			fmt.Fprint(w, "<p>No arguments</p>")
+		} else {
+			fmt.Fprint(w, "<ul>")
+			for _, a := range arguments {
+				fmt.Fprintf(w, "<li>%v</li>", a.title)
+			}
+			fmt.Fprintf(w, "</ul>")
+		}
+
+	})
+
+	http.ListenAndServe("localhost:8000", nil)
+}
+
+func findArgIdInPath(p string) (string, bool) {
+	return ("", false)
+	// if p[0:len(p)-3]
 }
