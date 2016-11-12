@@ -1,6 +1,8 @@
 localhost:8080
 
 root /vagrant/public
-proxy /api localhost:8000
+proxy / localhost:8000 {
+	except /robots.txt
+}
 
 gzip
