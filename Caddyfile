@@ -1,11 +1,8 @@
 localhost:8080
 
-# [root /vagrant/public + rewrite] doesn't seem to work,
-#  but this accomplishes basically the same thing.
-root /vagrant
+root /vagrant/public
 proxy / localhost:8000 {
-	except /robots.txt /public/
+	except /robots.txt
 }
-rewrite /robots.txt /public/robots.txt
 
 gzip
