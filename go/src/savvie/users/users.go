@@ -1,3 +1,9 @@
+// Package users handles user accounts. It is used to
+// hash user passwords, verify user login information,
+// and store user information. Because of hashing issues
+// at Code Camp, the old hash has been commented out, and
+// a new hash is being used. The code is left here so that
+// it can hopefully be used in future implementations.
 package users
 
 import (
@@ -6,26 +12,33 @@ import (
 	"time"
 
 	// "github.com/golang/crypto/scrypt"
-	//"crypto/rand"
-	//"io"
-	//"fmt"
+	// "crypto/rand"
 	"crypto/sha256"
+	"log"
 )
 
 const (
-	SALT_BYTES  = 32
-	HASH_BYTES  = 64
-	data_folder = "/vagrant/data/users/"
+	saltBytes  = 32
+	hashBytes  = 64
+	dataFolder = "/vagrant/data/users/"
 )
 
+// User is a struct made only for the purpose
+// of being returned to main.go to
+// verify new users don't already exist
+// and to verify passwords and whatnot.
 type User struct {
-	Name, Email  string
-	pwd          []byte
-	Date_Started time.Time
+	Name, Email string
+	pwd         []byte
+	DateStarted time.Time
 }
 
+// NewUser is a function that allows the main package to
+// create a new user after verifying that the
+// username doesn't already exist (usernames
+// are emails).
 func NewUser(name, email, pword string) {
-	f, err := os.Create(data_folder + email + ".txt")
+	f, err := os.Create(dataFolder + email + ".txt")
 	check(err)
 	defer f.Close()
 
@@ -41,6 +54,9 @@ func NewUser(name, email, pword string) {
 	f.Sync()
 }
 
+// GetUser is a function to return a user struct to the main package.
+// This is used to connect a user to an argument, verify
+// that a user exists or not, etc.
 func GetUser(email string) (user User) {
 	user = makeStruct(email)
 
@@ -52,7 +68,7 @@ func pHash(pword string) (hash []byte) {
 	//_, err := io.ReadFull(rand.Reader, salt)
 	//check(err)
 
-	// hash, err := scrypt.Key([]byte(pword), salt, 1<<14, 8, 1, HASH_BYTES)
+	// hash, err := scrypt.Key([]byte(pword), salt, 1<<14, 8, 1, hashBytes)
 	// check(err)
 
 	sum := sha256.Sum256([]byte(pword))
@@ -61,8 +77,14 @@ func pHash(pword string) (hash []byte) {
 	return
 }
 
+// Auth is a function that authenticates
+// a user's password based on the username
+// and password input.
 func Auth(email, pword string) bool {
 	user := makeStruct(email)
+	if user.Email == "" {
+		return false
+	}
 
 	password := pHash(pword)
 
@@ -92,7 +114,16 @@ func compareSlice(a, b []byte) bool {
 }
 
 func makeStruct(email string) (user User) {
-	f, err := os.Open(data_folder + email + ".txt")
+	if email == "" {
+		// Do not attempt to open a file if given an empty string.
+		return User{}
+	}
+	f, err := os.Open(dataFolder + email + ".txt")
+	if err != nil {
+		log.Println("Error making User struct:", err)
+		return User{}
+	}
+	defer f.Close()
 	check(err)
 
 	b := bufio.NewReader(f)
@@ -111,7 +142,7 @@ func makeStruct(email string) (user User) {
 	pwd, _, err := b.ReadLine()
 	check(err)
 
-	user = User{email, name, pwd, date}
+	user = User{name, email, pwd, date}
 
 	return
 }
